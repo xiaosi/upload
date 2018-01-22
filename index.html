@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=640,user-scalable=0"/>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="js/upload.min.js" charset="utf-8"></script>
+    <script src="js/alloy_finger.js" charset="utf-8"></script>
+    <script src="js/YinduCreate.js" charset="utf-8"></script>
+    <style media="screen">
+      *{
+        margin: 0;
+        padding: 0;
+
+      }
+      .controller{
+        position: relative;
+        width: 200px;
+        height: 200px;
+        background: #000;
+      }
+      canvas {
+        background: #ccc;
+      }
+    </style>
+    <script src="http://www.yindudigital.com/public/vconsole.min.js" charset="utf-8"></script>
+  </head>
+  <body>
+    <canvas id="canvas" width="640" height="640"></canvas>
+    <div class="controller"></div>
+  </body>
+  <script type="text/javascript">
+
+    var uf = new UploadFile({
+      selector:".controller"
+    });
+
+    var yc = new YinduCreate.Stage("canvas");
+
+
+    uf.on("loadfinish",function(ev){
+      var img = new Image;
+      img.onload = function(){
+        var bm = new YinduCreate.BitMap();
+        bm.texture = this;
+        bm.width = this.width;
+        bm.height = this.height;
+        bm.x = yc.width/2;
+        bm.y = yc.height/2;
+        bm.anchorOffsetX = this.width/2;
+        bm.anchorOffsetY = this.height/2;
+        bm.rotation = 0;
+        bm.scaleX = bm.scaleY = 1;
+        yc.addChild(bm);
+        var initScale = 1;
+        new AlloyFinger(document.querySelector("canvas"),{
+          multipointStart:function(){
+            initScale = bm.scaleX;
+          },
+          pressMove:function(evt){
+            bm.x += evt.deltaX;
+            bm.y += evt.deltaY;
+          },
+          rotate:function(evt){
+            bm.rotation += evt.angle;
+          },
+          pinch:function(evt){
+            bm.scaleX = bm.scaleY = initScale*evt.zoom;
+          }
+        });
+      }
+      img.src = ev.result;
+
+    });
+    var A = null;
+    frames();
+    function frames(){
+      yc.draw();
+      A = requestAnimationFrame(frames);
+    }
+  </script>
+</html>

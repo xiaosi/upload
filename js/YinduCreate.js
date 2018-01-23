@@ -46,6 +46,7 @@ var YinduCreate = (function(){
     this.$anchorOffsetY = 0;
     this.$scaleX = 1;
     this.$scaleY = 1;
+    
     this.$children = [];
     this.$parent = null;
 
@@ -203,6 +204,7 @@ var YinduCreate = (function(){
   function BitMap(texture){
     DisplayObject.apply(this,arguments);
     this.$texture = texture || null;
+
   }
   Object.defineProperties(BitMap.prototype,{
     "texture":{

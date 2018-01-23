@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=640,user-scalable=0"/>
+
+    <style media="screen">
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      .controller{
+        position: relative;
+        width: 200px;
+        height: 200px;
+        background: #000;
+      }
+      img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: translate3d(-100%,-100%,0);
+      }
+    </style>
+  </head>
+  <body>
+    <canvas width="640" height="640"></canvas>
+    <img src="anim1.jpg" class="anim1"/>
+    <div class="controller"></div>
+  </body>
+  <script src="js/upload.min.js" charset="utf-8"></script>
+  <script src="js/alloy_finger.js" charset="utf-8"></script>
+  <script src="src/DisplayObject.js" charset="utf-8"></script>
+  <script type="text/javascript">
+  window.onload = function(){
+    var stage = new YinduCreate.Stage(document.querySelector("canvas"));
+
+    document.addEventListener("touchmove",function(evt){
+      return evt.preventDefault(),false;
+    },false);
+    var bm = new YinduCreate.BitMap();
+      bm.texture = document.querySelector(".anim1");
+      bm.anchorOffsetX = bm.width/2;
+      bm.anchorOffsetY = bm.height/2;
+      bm.x = stage.width/2;
+      bm.y = stage.height/2;
+      stage.addChild(bm);
+      var uf = new UploadFile({
+        selector:".controller"
+      });
+      uf.on("loadfinish",function(ev){
+        var img = new Image;
+        img.onload = function(){
+          var bm = new YinduCreate.BitMap();
+          bm.texture = this;
+          bm.width = this.width;
+          bm.height = this.height;
+          bm.x = stage.width/2;
+          bm.y = stage.height/2;
+          bm.anchorOffsetX = this.width/2;
+          bm.anchorOffsetY = this.height/2;
+          bm.rotation = 0;
+          bm.scaleX = bm.scaleY = 1;
+          stage.addChild(bm);
+        }
+        img.src = ev.result;
+
+      });
+      var obj = null ,initScale = 1;
+      new AlloyFinger(document.querySelector("canvas"),{
+        touchStart:function(evt){
+          obj = bm;
+        },
+        multipointStart:function(evt){
+          obj = bm;
+          initScale = obj.scaleX;
+        },
+        pressMove:function(evt){
+          obj.x += evt.deltaX;
+          obj.y += evt.deltaY;
+        },
+        rotate:function(evt){
+          obj.rotation += evt.angle;
+        },
+        pinch:function(evt){
+          obj.scaleX = obj.scaleY = initScale*evt.zoom;
+        }
+      });
+
+      frames();
+      function frames(){
+        stage.update();
+        A = requestAnimationFrame(frames);
+      }
+
+    }
+
+
+
+  </script>
+</html>
